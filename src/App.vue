@@ -128,6 +128,25 @@ onUnmounted(() => {
   transform: scale(0.99);
 }
 
+/* Mobile - always rotate cassette 90° (portrait or landscape) */
+@media (max-width: 768px) {
+  .container {
+    padding: 10px;
+  }
+  
+  .cassette {
+    transform: rotate(90deg) !important;
+  }
+  
+  .cassette:hover {
+    transform: rotate(90deg) scale(1.02) !important;
+  }
+  
+  .cassette:active {
+    transform: rotate(90deg) scale(0.99) !important;
+  }
+}
+
 .cassette-body {
   position: relative;
   width: 500px;
@@ -138,6 +157,73 @@ onUnmounted(() => {
   box-shadow: 
     0 8px 24px rgba(0, 0, 0, 0.6),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Responsive sizing for tablets */
+@media (max-width: 768px) {
+  .cassette-body {
+    width: 400px;
+    height: 256px;
+    padding: 16px;
+  }
+  
+  .status {
+    font-size: 16px;
+    margin-top: 20px;
+  }
+}
+
+/* Responsive sizing for small mobile */
+@media (max-width: 480px) {
+  .cassette-body {
+    width: 340px;
+    height: 217px;
+    padding: 14px;
+  }
+  
+  .title-band {
+    height: 32px;
+    margin-bottom: 12px;
+  }
+  
+  .title-input {
+    font-size: 13px;
+  }
+  
+  .tape-window {
+    height: 150px;
+    padding: 20px 30px;
+  }
+  
+  .status {
+    font-size: 14px;
+    margin-top: 15px;
+  }
+  
+  .screw {
+    width: 10px;
+    height: 10px;
+  }
+  
+  .screw.top-left,
+  .screw.top-right {
+    top: 20px;
+  }
+  
+  .screw.top-left,
+  .screw.bottom-left {
+    left: 20px;
+  }
+  
+  .screw.top-right,
+  .screw.bottom-right {
+    right: 20px;
+  }
+  
+  .screw.bottom-left,
+  .screw.bottom-right {
+    bottom: 20px;
+  }
 }
 
 .outer-frame {
