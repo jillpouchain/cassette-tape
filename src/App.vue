@@ -95,11 +95,6 @@ onUnmounted(() => {
         <div class="screw bottom-left"></div>
         <div class="screw bottom-right"></div>
       </div>
-      
-      <!-- Indicateur de statut -->
-      <div class="status">
-        {{ isPlaying ? '▶ PLAYING' : '⏸ PAUSED' }}
-      </div>
     </div>
   </div>
 </template>
@@ -128,25 +123,6 @@ onUnmounted(() => {
   transform: scale(0.99);
 }
 
-/* Mobile - always rotate cassette 90° (portrait or landscape) */
-@media (max-width: 768px) {
-  .container {
-    padding: 10px;
-  }
-  
-  .cassette {
-    transform: rotate(90deg) !important;
-  }
-  
-  .cassette:hover {
-    transform: rotate(90deg) scale(1.02) !important;
-  }
-  
-  .cassette:active {
-    transform: rotate(90deg) scale(0.99) !important;
-  }
-}
-
 .cassette-body {
   position: relative;
   width: 500px;
@@ -157,72 +133,92 @@ onUnmounted(() => {
   box-shadow: 
     0 8px 24px rgba(0, 0, 0, 0.6),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: transform 0.2s;
 }
 
-/* Responsive sizing for tablets */
+/* Mobile - always rotate cassette 90° (portrait or landscape) */
 @media (max-width: 768px) {
-  .cassette-body {
-    width: 400px;
-    height: 256px;
-    padding: 16px;
+  .container {
+    padding: 0;
+    overflow: hidden;
   }
   
-  .status {
-    font-size: 16px;
-    margin-top: 20px;
-  }
-}
-
-/* Responsive sizing for small mobile */
-@media (max-width: 480px) {
   .cassette-body {
-    width: 340px;
-    height: 217px;
-    padding: 14px;
+    /* Largeur = hauteur viewport (car rotation 90°) */
+    /* Ratio original: 500/320 = 1.5625 */
+    width: calc(100vh - 40px);
+    height: calc((100vh - 40px) / 1.5625);
+    max-width: 600px;
+    max-height: 384px;
+    padding: 3.2%;
+    transform: rotate(90deg);
+    overflow: hidden;
+  }
+  
+  .cassette:hover .cassette-body {
+    transform: rotate(90deg) scale(1.02);
+  }
+  
+  .cassette:active .cassette-body {
+    transform: rotate(90deg) scale(0.99);
   }
   
   .title-band {
-    height: 32px;
-    margin-bottom: 12px;
+    height: 8%;
+    margin-bottom: 2%;
   }
   
   .title-input {
-    font-size: 13px;
+    font-size: clamp(12px, 3vw, 16px);
   }
   
   .tape-window {
-    height: 150px;
-    padding: 20px 30px;
+    height: 75%;
+    padding: 4% 6%;
+    margin: 0;
   }
   
-  .status {
-    font-size: 14px;
-    margin-top: 15px;
+  .reel-container {
+    gap: 8%;
+  }
+  
+  .reel {
+    max-width: 30%;
+  }
+  
+  .outer-frame {
+    border-width: 2px;
   }
   
   .screw {
-    width: 10px;
-    height: 10px;
+    width: 2.5%;
+    height: 2.5%;
+    min-width: 10px;
+    min-height: 10px;
+  }
+  
+  .screw::before {
+    height: 1.5px;
   }
   
   .screw.top-left,
   .screw.top-right {
-    top: 20px;
+    top: 4%;
   }
   
   .screw.top-left,
   .screw.bottom-left {
-    left: 20px;
+    left: 4%;
   }
   
   .screw.top-right,
   .screw.bottom-right {
-    right: 20px;
+    right: 4%;
   }
   
   .screw.bottom-left,
   .screw.bottom-right {
-    bottom: 20px;
+    bottom: 4%;
   }
 }
 
@@ -433,16 +429,5 @@ onUnmounted(() => {
 .screw.bottom-right {
   bottom: 25px;
   right: 25px;
-}
-
-.status {
-  text-align: center;
-  margin-top: 25px;
-  font-size: 20px;
-  font-weight: 600;
-  color: #ccc;
-  font-family: 'Arial', sans-serif;
-  letter-spacing: 2px;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 </style>
