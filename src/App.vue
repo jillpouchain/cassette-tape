@@ -1,77 +1,97 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 
+// Types
+interface MusicTrack {
+  id: string
+  nom: string
+  duree: number
+  fichier: string
+}
+
+// État de la cassette
 const isPlaying = ref(false)
 const leftTapeSize = ref(85)
 const rightTapeSize = ref(15)
 const mixtapeTitle = ref('MIXTAPE 2025')
-const showPlayer = ref(false)
 
-// ID de la track Spotify par défaut (configurable via .env)
-// Format: spotify:track:ID ou juste l'ID
-const defaultTrackId = ref(
-  import.meta.env.VITE_SPOTIFY_DEFAULT_TRACK || '3n3Ppam7vgaVa1iaRUc9Lp'
-)
+// Musique
+const audioElement = ref<HTMLAudioElement | null>(null)
+const currentTrack = ref<MusicTrack | null>(null)
+const tracks = ref<MusicTrack[]>([])
 
-// Extraire l'ID si c'est un URI complet
-const getTrackId = () => {
-  const track = defaultTrackId.value
-  if (track.includes('spotify:track:')) {
-    return track.split('spotify:track:')[1]
-  }
-  return track
-}
-
-// Animation des bandes magnétiques
-let animationInterval: number | null = null
-
-const startAnimation = () => {
-  if (animationInterval) return
-  
-  animationInterval = setInterval(() => {
-    if (leftTapeSize.value <= 15) {
-      stopAnimation()
-      isPlaying.value = false
-      // Réinitialiser
-      leftTapeSize.value = 85
-      rightTapeSize.value = 15
-      return
-    }
+// Chargement de la configuration des musiques
+const loadMusicConfig = async () => {
+  try {
+    const response = await fetch('/musique/config.json')
+    const data = await response.json()
+    tracks.value = data
     
-    leftTapeSize.value -= 0.35
-    rightTapeSize.value += 0.35
-  }, 50)
+    if (tracks.value.length > 0) {
+      const firstTrack = tracks.value[0]
+      if (firstTrack) {
+        currentTrack.value = firstTrack
+        mixtapeTitle.value = firstTrack.nom.toUpperCase()
+      }
+    }
+  } catch (error) {
+    console.error('❌ Erreur lors du chargement de la configuration:', error)
+  }
 }
 
-const stopAnimation = () => {
-  if (animationInterval) {
-    clearInterval(animationInterval)
-    animationInterval = null
-  }
+// Initialiser l'audio
+const initAudio = () => {
+  if (!currentTrack.value) return
+  
+  const audio = new Audio(`/musique/${currentTrack.value.fichier}`)
+  audio.volume = 0.7
+  
+  // Événement : musique terminée
+  audio.addEventListener('ended', () => {
+    isPlaying.value = false
+    leftTapeSize.value = 85
+    rightTapeSize.value = 15
+  })
+  
+  // Événement : mise à jour de la progression
+  audio.addEventListener('timeupdate', () => {
+    if (currentTrack.value && currentTrack.value.duree > 0) {
+      const progress = (audio.currentTime / currentTrack.value.duree) * 100
+      leftTapeSize.value = 85 - (progress * 0.70) // Va de 85% à 15%
+      rightTapeSize.value = 15 + (progress * 0.70) // Va de 15% à 85%
+    }
+  })
+  
+  audioElement.value = audio
 }
 
 // Toggle Play/Pause
 const togglePlay = () => {
-  // Toggle le player Spotify embed
-  showPlayer.value = !showPlayer.value
+  if (!audioElement.value) {
+    initAudio()
+  }
   
-  // Animation des bandes (indépendante du player)
-  isPlaying.value = !isPlaying.value
+  if (!audioElement.value) return
   
   if (isPlaying.value) {
-    startAnimation()
+    audioElement.value.pause()
+    isPlaying.value = false
   } else {
-    stopAnimation()
+    audioElement.value.play()
+    isPlaying.value = true
   }
 }
 
-onMounted(() => {
-  // Nettoyer au cas où
-  return () => stopAnimation()
+onMounted(async () => {
+  await loadMusicConfig()
+  initAudio()
 })
 
 onUnmounted(() => {
-  stopAnimation()
+  if (audioElement.value) {
+    audioElement.value.pause()
+    audioElement.value = null
+  }
 })
 </script>
 
@@ -128,22 +148,6 @@ onUnmounted(() => {
         <div class="screw bottom-right"></div>
       </div>
     </div>
-    
-    <!-- Spotify Embed Player (apparaît en cliquant sur la cassette) -->
-    <transition name="fade">
-      <div v-if="showPlayer" class="spotify-player-container" @click.stop>
-        <button class="close-button" @click="showPlayer = false">✕</button>
-        <iframe
-          :src="`https://open.spotify.com/embed/track/${getTrackId()}?utm_source=generator`"
-          width="100%"
-          height="152"
-          frameBorder="0"
-          allowfullscreen
-          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-          loading="lazy"
-        ></iframe>
-      </div>
-    </transition>
   </div>
 </template>
 
@@ -477,71 +481,5 @@ onUnmounted(() => {
 .screw.bottom-right {
   bottom: 25px;
   right: 25px;
-}
-
-/* Spotify Embed Player */
-.spotify-player-container {
-  position: fixed;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 90%;
-  max-width: 500px;
-  background: rgba(30, 30, 30, 0.98);
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.8),
-    0 0 0 1px rgba(255, 255, 255, 0.1);
-  z-index: 1000;
-  backdrop-filter: blur(10px);
-}
-
-.close-button {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: rgba(255, 255, 255, 0.1);
-  border: none;
-  color: white;
-  font-size: 20px;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s;
-  z-index: 1;
-}
-
-.close-button:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-/* Animation fade pour le player */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s, transform 0.3s;
-}
-
-.fade-enter-from {
-  opacity: 0;
-  transform: translateX(-50%) translateY(20px);
-}
-
-.fade-leave-to {
-  opacity: 0;
-  transform: translateX(-50%) translateY(20px);
-}
-
-/* Mobile - ajuster le player */
-@media (max-width: 768px) {
-  .spotify-player-container {
-    bottom: 20px;
-    width: 95%;
-    padding: 15px;
-  }
 }
 </style>
