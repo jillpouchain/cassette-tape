@@ -1,0 +1,23 @@
+🎵 Fichier audio de démo nécessaire
+=====================================
+
+Pour que l'application fonctionne immédiatement, vous avez deux options :
+
+Option 1 : Ajouter votre propre fichier MP3
+--------------------------------------------
+1. Placez un fichier MP3 nommé "demo.mp3" dans ce dossier
+2. Ou changez le fichier config.json pour pointer vers votre MP3
+
+Option 2 : Télécharger un fichier de démo libre de droits
+----------------------------------------------------------
+Voici quelques sources de musique libre de droits :
+
+- Free Music Archive : https://freemusicarchive.org/
+- Incompetech : https://incompetech.com/music/royalty-free/
+- YouTube Audio Library : https://www.youtube.com/audiolibrary
+- Bensound : https://www.bensound.com/
+
+Une fois téléchargé, renommez-le en "demo.mp3" ou mettez à jour config.json
+
+Note : Le fichier demo.mp3 n'est pas inclus dans le repository pour des raisons de taille et de droits d'auteur.
+
