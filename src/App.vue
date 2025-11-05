@@ -23,7 +23,16 @@ const tracks = ref<MusicTrack[]>([])
 // Chargement de la configuration des musiques
 const loadMusicConfig = async () => {
   try {
-    const response = await fetch('/musique/config.json')
+    // Utiliser import.meta.env.BASE_URL pour supporter GitHub Pages
+    const basePath = import.meta.env.BASE_URL || '/'
+    const configPath = `${basePath}musique/config.json`
+    
+    const response = await fetch(configPath)
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    
     const data = await response.json()
     tracks.value = data
     
@@ -43,7 +52,11 @@ const loadMusicConfig = async () => {
 const initAudio = () => {
   if (!currentTrack.value) return
   
-  const audio = new Audio(`/musique/${currentTrack.value.fichier}`)
+  // Utiliser import.meta.env.BASE_URL pour supporter GitHub Pages
+  const basePath = import.meta.env.BASE_URL || '/'
+  const audioPath = `${basePath}musique/${currentTrack.value.fichier}`
+  
+  const audio = new Audio(audioPath)
   audio.volume = 0.7
   
   // Événement : musique terminée
