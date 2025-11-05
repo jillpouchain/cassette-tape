@@ -106,6 +106,13 @@ const exchangeCodeForToken = async (code: string) => {
     
     if (data.access_token) {
       spotifyToken.value = data.access_token
+      
+      // Sauvegarder le token et son heure d'expiration (1h par défaut)
+      const expiresIn = data.expires_in || 3600 // 3600 secondes = 1h
+      const expiresAt = Date.now() + (expiresIn * 1000)
+      localStorage.setItem('spotify_token', data.access_token)
+      localStorage.setItem('spotify_token_expires_at', expiresAt.toString())
+      
       localStorage.removeItem('code_verifier')
       // Nettoyer l'URL
       window.history.replaceState({}, document.title, window.location.pathname)
@@ -228,6 +235,28 @@ const togglePlay = () => {
 }
 
 onMounted(() => {
+  // Vérifier s'il y a un token valide dans localStorage
+  const savedToken = localStorage.getItem('spotify_token')
+  const expiresAt = localStorage.getItem('spotify_token_expires_at')
+  
+  if (savedToken && expiresAt) {
+    const now = Date.now()
+    const tokenExpiresAt = parseInt(expiresAt)
+    
+    // Si le token n'a pas expiré, l'utiliser directement
+    if (now < tokenExpiresAt) {
+      console.log('✅ Token Spotify valide trouvé dans localStorage')
+      spotifyToken.value = savedToken
+      initSpotifyPlayer()
+      return
+    } else {
+      // Token expiré, le supprimer
+      console.log('⏰ Token Spotify expiré, nouvelle authentification nécessaire')
+      localStorage.removeItem('spotify_token')
+      localStorage.removeItem('spotify_token_expires_at')
+    }
+  }
+  
   // Récupérer le code de l'URL après auth (PKCE)
   const urlParams = new URLSearchParams(window.location.search)
   const code = urlParams.get('code')
