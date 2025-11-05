@@ -1,17 +1,17 @@
 # 🎵 Cassette Tape Player
 
-An interactive retro cassette tape player with **Spotify integration** built with Vue 3 and TypeScript.
+An interactive retro cassette tape player with **Spotify Embed** built with Vue 3 and TypeScript.
 
 ## Features
 
-- **🎧 Spotify Integration**: Play real music from Spotify with Web Playback SDK
-- **🎯 Real-time Synchronization**: Tape reels animate perfectly in sync with the actual song progress
-- **🎵 Interactive playback**: Click the cassette to play/pause
-- **📼 Animated tape reels**: Red reels that grow and shrink realistically as the song plays
+- **🎧 Spotify Integration**: Play real music from Spotify with Embed Player (no authentication needed!)
+- **🎵 Interactive playback**: Click the cassette to reveal the Spotify player
+- **📼 Animated tape reels**: Red reels that grow and shrink realistically
 - **⚙️ Spinning mechanism**: Rotating center holes when playing
-- **🏷️ Smart label**: Automatically displays the current track name and artist
+- **🏷️ Editable label**: Customize the cassette title
 - **📱 Responsive design**: Automatically rotates 90° on mobile devices for optimal viewing
 - **🎨 Realistic design**: Classic cassette tape appearance with proper shadows and depth
+- **✨ No login required**: Uses Spotify Embed - just click and listen!
 
 ## Getting Started
 
@@ -20,36 +20,24 @@ An interactive retro cassette tape player with **Spotify integration** built wit
 npm install
 ```
 
-### 2. Configure Spotify (Required)
+### 2. (Optional) Configure default Spotify track
 
-**⚠️ Important**: Spotify Premium account required to play music.
+**✨ No Spotify app or authentication required!**
 
-#### 🔒 Secure Configuration (Recommended)
+By default, the cassette plays a demo track. To change it:
 
-**DO NOT put your Client ID directly in the code!**
+1. **Find a Spotify track ID:**
+   - Go to [Spotify Web](https://open.spotify.com/)
+   - Find any song and click "Share" → "Copy link"
+   - Example link: `https://open.spotify.com/track/3n3Ppam7vgaVa1iaRUc9Lp`
+   - Extract the ID: `3n3Ppam7vgaVa1iaRUc9Lp`
 
-Follow the complete guide: **[SECURE_SETUP.md](./SECURE_SETUP.md)**
-
-**Quick steps:**
-
-1. Go to [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
-2. Create/open your app and copy the **Client ID**
-3. Add these **Redirect URIs** in your app settings:
-   - `http://127.0.0.1:5173` (use IP instead of localhost if Spotify refuses http)
-   - `https://jillpouchain.github.io/cassette-tape/`
-4. Check **Web API** and **Web Playback SDK**
-5. **Create a `.env` file** at the project root:
+2. **Create a `.env` file** at the project root:
    ```env
-   VITE_SPOTIFY_CLIENT_ID=your_client_id_here
+   VITE_SPOTIFY_DEFAULT_TRACK=3n3Ppam7vgaVa1iaRUc9Lp
    ```
 
-📚 **Guides:**
-- ✅ [SPOTIFY_PKCE_SETUP.md](./SPOTIFY_PKCE_SETUP.md) - **START HERE** - Simple Spotify setup (2024)
-- 🔒 [SECURE_SETUP.md](./SECURE_SETUP.md) - Complete security guide
-- 📝 [CREATE_ENV_FILE.md](./CREATE_ENV_FILE.md) - How to create .env file
-- 🔧 [ENV_VARIABLES.md](./ENV_VARIABLES.md) - All environment variables explained
-- 🔧 [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) - Fix common issues
-- 🐛 [DEBUG_CHECKLIST.md](./DEBUG_CHECKLIST.md) - Step-by-step debugging
+That's it! No Spotify app, no Client ID, no authentication needed! 🎉
 
 ### 3. Development
 ```bash
@@ -59,9 +47,8 @@ npm run dev
 ### 4. First Use
 
 1. Open http://localhost:5173
-2. Click on the cassette
-3. Authenticate with your Spotify account
-4. Enjoy your music! 🎵
+2. Click on the cassette to reveal the Spotify player
+3. Enjoy your music! 🎵 (No login required!)
 
 ### Build for production
 ```bash
@@ -75,31 +62,31 @@ npm run preview
 
 ## Usage
 
-- **Play/Pause**: Click anywhere on the cassette body
-- **Watch the magic**: The tape reels animate in perfect sync with the song playing
-- **Track info**: The current song and artist automatically display on the label
-- **Mobile**: View in portrait mode - the cassette automatically rotates 90° for the best experience
+- **Click the cassette**: Opens the Spotify embed player
+- **Watch the animation**: The tape reels spin and animate
+- **Edit the label**: Click on the "MIXTAPE 2025" text to customize it
+- **Mobile**: View in portrait or landscape - the cassette automatically rotates 90° for the best experience
+- **Control music**: Use the Spotify embed player to play, pause, adjust volume, etc.
 
 ### Change the default track
 
-Edit `src/App.vue` line 17:
-```typescript
-const defaultTrackUri = ref('spotify:track:YOUR_TRACK_ID')
+Add to your `.env` file:
+```env
+VITE_SPOTIFY_DEFAULT_TRACK=3n3Ppam7vgaVa1iaRUc9Lp
 ```
 
-**How to find a Spotify track URI:**
-1. Open Spotify (web or app)
-2. Right-click on any song → Share → Copy song link
+**How to find a Spotify track ID:**
+1. Open [Spotify Web](https://open.spotify.com/)
+2. Find any song → Share → Copy song link
 3. Extract the ID from the URL: `https://open.spotify.com/track/3n3Ppam7vgaVa1iaRUc9Lp`
-4. Format as: `spotify:track:3n3Ppam7vgaVa1iaRUc9Lp`
+4. The ID is: `3n3Ppam7vgaVa1iaRUc9Lp`
 
 ## Tech Stack
 
 - Vue 3 with Composition API
 - TypeScript
 - Vite
-- Spotify Web Playback SDK
-- Spotify Web API
+- Spotify Embed Player (iframe)
 - CSS with scoped styles and responsive design
 
 ## Project Structure
