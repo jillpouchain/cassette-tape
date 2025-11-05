@@ -1,0 +1,15 @@
+[
+  {
+    "id": "chanson-1",
+    "nom": "Titre de la Chanson - Nom de l'Artiste",
+    "duree": 180,
+    "fichier": "ma-chanson.mp3"
+  },
+  {
+    "id": "chanson-2",
+    "nom": "Une Autre Chanson - Autre Artiste",
+    "duree": 240,
+    "fichier": "autre-chanson.mp3"
+  }
+]
+
