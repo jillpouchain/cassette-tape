@@ -18,10 +18,11 @@ dist-ssr
 .env.production
 
 # Music files (keep config.json and README.md but not the MP3s)
-public/musique/*.mp3
-public/musique/*.wav
-public/musique/*.ogg
-public/musique/*.m4a
+# Commented out to allow committing specific MP3 files
+# public/musique/*.mp3
+# public/musique/*.wav
+# public/musique/*.ogg
+# public/musique/*.m4a
 
 # Editor directories and files
 .vscode/*
