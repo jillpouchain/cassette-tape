@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 
 // Types
 interface MusicTrack {
@@ -11,8 +10,12 @@ interface MusicTrack {
   color: string
 }
 
-// Router
-const route = useRoute()
+// Récupérer l'ID depuis les query parameters
+const getTrackIdFromUrl = (): number => {
+  const params = new URLSearchParams(window.location.search)
+  const id = params.get('id')
+  return id ? parseInt(id) : 1
+}
 
 // État de la cassette
 const isPlaying = ref(false)
@@ -47,8 +50,8 @@ const loadMusicConfig = async () => {
     const data = await response.json()
     tracks.value = data
     
-    // Récupérer l'ID depuis l'URL
-    const trackId = route.params.id ? parseInt(route.params.id as string) : 1
+    // Récupérer l'ID depuis les query parameters
+    const trackId = getTrackIdFromUrl()
     
     // Chercher la piste correspondant à l'ID
     const selectedTrack = tracks.value.find(track => track.id === trackId)
@@ -134,16 +137,12 @@ const reloadTrack = async () => {
   initAudio()
 }
 
-// Observer les changements d'ID dans l'URL
-watch(() => route.params.id, async (newId, oldId) => {
-  if (newId !== oldId) {
-    await reloadTrack()
-  }
-})
-
 onMounted(async () => {
   await loadMusicConfig()
   initAudio()
+  
+  // Écouter les changements d'URL (navigation avec les boutons précédent/suivant)
+  window.addEventListener('popstate', reloadTrack)
 })
 
 onUnmounted(() => {
@@ -151,6 +150,9 @@ onUnmounted(() => {
     audioElement.value.pause()
     audioElement.value = null
   }
+  
+  // Retirer l'écouteur d'événements
+  window.removeEventListener('popstate', reloadTrack)
 })
 </script>
 
