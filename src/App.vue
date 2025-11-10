@@ -1,19 +1,30 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
+import { useRoute } from 'vue-router'
 
 // Types
 interface MusicTrack {
-  id: string
+  id: number
   nom: string
   duree: number
   fichier: string
+  color: string
 }
+
+// Router
+const route = useRoute()
 
 // État de la cassette
 const isPlaying = ref(false)
 const leftTapeSize = ref(85)
 const rightTapeSize = ref(15)
 const mixtapeTitle = ref('MIXTAPE 2025')
+
+// Couleur de la cassette basée sur la piste
+const tapeColor = computed(() => {
+  if (!currentTrack.value || !currentTrack.value.color) return 'red'
+  return currentTrack.value.color
+})
 
 // Musique
 const audioElement = ref<HTMLAudioElement | null>(null)
@@ -36,7 +47,17 @@ const loadMusicConfig = async () => {
     const data = await response.json()
     tracks.value = data
     
-    if (tracks.value.length > 0) {
+    // Récupérer l'ID depuis l'URL
+    const trackId = route.params.id ? parseInt(route.params.id as string) : 1
+    
+    // Chercher la piste correspondant à l'ID
+    const selectedTrack = tracks.value.find(track => track.id === trackId)
+    
+    if (selectedTrack) {
+      currentTrack.value = selectedTrack
+      mixtapeTitle.value = selectedTrack.nom.toUpperCase()
+    } else if (tracks.value.length > 0) {
+      // Si l'ID n'existe pas, charger la première piste
       const firstTrack = tracks.value[0]
       if (firstTrack) {
         currentTrack.value = firstTrack
@@ -95,6 +116,31 @@ const togglePlay = () => {
   }
 }
 
+// Fonction pour recharger la piste quand l'URL change
+const reloadTrack = async () => {
+  // Arrêter la musique actuelle si elle joue
+  if (audioElement.value) {
+    audioElement.value.pause()
+    audioElement.value = null
+  }
+  
+  // Réinitialiser l'état
+  isPlaying.value = false
+  leftTapeSize.value = 85
+  rightTapeSize.value = 15
+  
+  // Recharger la configuration et la piste
+  await loadMusicConfig()
+  initAudio()
+}
+
+// Observer les changements d'ID dans l'URL
+watch(() => route.params.id, async (newId, oldId) => {
+  if (newId !== oldId) {
+    await reloadTrack()
+  }
+})
+
 onMounted(async () => {
   await loadMusicConfig()
   initAudio()
@@ -131,7 +177,7 @@ onUnmounted(() => {
           <!-- Deux bobines avec bandes magnétiques -->
           <div class="reel-container">
             <!-- Bobine gauche -->
-            <div class="reel left" :style="{ '--size': leftTapeSize }">
+            <div class="reel left" :style="{ '--size': leftTapeSize, '--tape-color': tapeColor }">
               <div class="reel-center">
                 <div class="reel-inner">
                   <div class="reel-hole" :class="{ spinning: isPlaying }">
@@ -142,7 +188,7 @@ onUnmounted(() => {
             </div>
             
             <!-- Bobine droite -->
-            <div class="reel right" :style="{ '--size': rightTapeSize }">
+            <div class="reel right" :style="{ '--size': rightTapeSize, '--tape-color': tapeColor }">
               <div class="reel-center">
                 <div class="reel-inner">
                   <div class="reel-hole" :class="{ spinning: isPlaying }">
@@ -370,32 +416,19 @@ onUnmounted(() => {
   transition: all 0.05s linear;
 }
 
-.reel.left .reel-center {
-  width: calc(100px + var(--size) * 0.6px);
-  height: calc(100px + var(--size) * 0.6px);
-  background: radial-gradient(circle, 
-    #d32f2f 0%,
-    #c62828 30%,
-    #b71c1c 60%,
-    #8b0000 100%);
-  box-shadow: 
-    0 2px 8px rgba(0, 0, 0, 0.4),
-    inset 0 -2px 8px rgba(0, 0, 0, 0.3),
-    inset 0 2px 4px rgba(255, 100, 100, 0.3);
-}
-
+.reel.left .reel-center,
 .reel.right .reel-center {
   width: calc(100px + var(--size) * 0.6px);
   height: calc(100px + var(--size) * 0.6px);
   background: radial-gradient(circle, 
-    #d32f2f 0%,
-    #c62828 30%,
-    #b71c1c 60%,
-    #8b0000 100%);
+    color-mix(in srgb, var(--tape-color, red) 100%, white 20%) 0%,
+    color-mix(in srgb, var(--tape-color, red) 100%, white 10%) 30%,
+    color-mix(in srgb, var(--tape-color, red) 100%, black 20%) 60%,
+    color-mix(in srgb, var(--tape-color, red) 100%, black 40%) 100%);
   box-shadow: 
     0 2px 8px rgba(0, 0, 0, 0.4),
     inset 0 -2px 8px rgba(0, 0, 0, 0.3),
-    inset 0 2px 4px rgba(255, 100, 100, 0.3);
+    inset 0 2px 4px color-mix(in srgb, var(--tape-color, red) 50%, white 50%);
 }
 
 .reel-inner {
@@ -403,15 +436,15 @@ onUnmounted(() => {
   height: 70%;
   border-radius: 50%;
   background: radial-gradient(circle,
-    #a31f1f 0%,
-    #8b1818 50%,
-    #6d0000 100%);
+    color-mix(in srgb, var(--tape-color, red) 100%, black 30%) 0%,
+    color-mix(in srgb, var(--tape-color, red) 100%, black 40%) 50%,
+    color-mix(in srgb, var(--tape-color, red) 100%, black 55%) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 
     inset 0 2px 6px rgba(0, 0, 0, 0.5),
-    0 1px 3px rgba(255, 100, 100, 0.2);
+    0 1px 3px color-mix(in srgb, var(--tape-color, red) 50%, white 50%);
 }
 
 .reel-hole {

@@ -1,9 +1,21 @@
 [
   {
-    "id": "1",
+    "id": 1,
     "nom": "Never Gonna Give You Up",
     "duree": 213,
-    "fichier": "rick-astley--never-gonna-give-you-up.mp3"
+    "fichier": "rick-astley--never-gonna-give-you-up.mp3",
+    "color": "red"
+  },{
+    "id": 2,
+    "nom": "I Gotta Feeling",
+    "duree": 291,
+    "fichier": "the-black-eyed-peas--i-gotta-feeling.mp3",
+    "color": "blue"
+  },{
+    "id": 3,
+    "nom": "Tik Tok",
+    "duree": 216,
+    "fichier": "kesha--tik-tok.mp3",
+    "color": "green"
   }
 ]
-
