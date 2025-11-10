@@ -10,11 +10,27 @@ interface MusicTrack {
   color: string
 }
 
-// Récupérer l'ID depuis les query parameters
+// Récupérer l'ID depuis l'URL (supporte ?id=2 ou /2)
 const getTrackIdFromUrl = (): number => {
+  // D'abord, essayer les query parameters (?id=2)
   const params = new URLSearchParams(window.location.search)
-  const id = params.get('id')
-  return id ? parseInt(id) : 1
+  const queryId = params.get('id')
+  if (queryId) {
+    return parseInt(queryId)
+  }
+  
+  // Sinon, essayer de récupérer depuis le path (/2)
+  const path = window.location.pathname
+  const basePath = import.meta.env.BASE_URL || '/'
+  const pathAfterBase = path.replace(basePath, '')
+  const pathId = pathAfterBase.replace(/^\/+|\/+$/g, '') // Enlever les slashes au début/fin
+  
+  if (pathId && !isNaN(parseInt(pathId))) {
+    return parseInt(pathId)
+  }
+  
+  // Par défaut, retourner 1
+  return 1
 }
 
 // État de la cassette
