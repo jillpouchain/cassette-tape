@@ -153,28 +153,32 @@ const reloadTrack = async () => {
   initAudio()
   
   // Démarrer la lecture automatiquement
-  if (audioElement.value) {
-    audioElement.value.play().then(() => {
-      isPlaying.value = true
-    }).catch((error) => {
-      console.log('Autoplay bloqué par le navigateur:', error)
-    })
-  }
+  setTimeout(() => {
+    if (audioElement.value) {
+      audioElement.value.play().then(() => {
+        isPlaying.value = true
+      }).catch((error: unknown) => {
+        console.log('Autoplay bloqué par le navigateur:', error)
+      })
+    }
+  }, 100)
 }
 
 onMounted(async () => {
   await loadMusicConfig()
   initAudio()
   
-  // Démarrer la lecture automatiquement
-  if (audioElement.value) {
-    audioElement.value.play().then(() => {
-      isPlaying.value = true
-    }).catch((error) => {
-      // Certains navigateurs bloquent l'autoplay, on laisse l'utilisateur cliquer
-      console.log('Autoplay bloqué par le navigateur:', error)
-    })
-  }
+  // Démarrer la lecture automatiquement (avec un petit délai pour s'assurer que l'audio est initialisé)
+  setTimeout(() => {
+    if (audioElement.value) {
+      audioElement.value.play().then(() => {
+        isPlaying.value = true
+      }).catch((error: unknown) => {
+        // Certains navigateurs bloquent l'autoplay, on laisse l'utilisateur cliquer
+        console.log('Autoplay bloqué par le navigateur:', error)
+      })
+    }
+  }, 100)
   
   // Écouter les changements d'URL (navigation avec les boutons précédent/suivant)
   window.addEventListener('popstate', reloadTrack)
