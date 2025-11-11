@@ -98,7 +98,6 @@ const initAudio = () => {
   
   const audio = new Audio(audioPath)
   audio.volume = 0.7
-  audio.preload = 'auto'
   
   // Événement : musique terminée
   audio.addEventListener('ended', () => {
@@ -156,28 +155,10 @@ const reloadTrack = async () => {
   // Démarrer la lecture automatiquement
   setTimeout(() => {
     if (audioElement.value) {
-      // Essayer d'abord avec le son
       audioElement.value.play().then(() => {
         isPlaying.value = true
       }).catch((error: unknown) => {
-        // Si l'autoplay avec son est bloqué, essayer en mode muted
-        console.log('Autoplay avec son bloqué, essai en mode muet:', error)
-        if (audioElement.value) {
-          const originalVolume = audioElement.value.volume
-          audioElement.value.muted = true
-          audioElement.value.play().then(() => {
-            isPlaying.value = true
-            // Réactiver le son après 500ms
-            setTimeout(() => {
-              if (audioElement.value) {
-                audioElement.value.muted = false
-                audioElement.value.volume = originalVolume
-              }
-            }, 500)
-          }).catch((muteError: unknown) => {
-            console.log('Autoplay complètement bloqué:', muteError)
-          })
-        }
+        console.log('Autoplay bloqué par le navigateur:', error)
       })
     }
   }, 100)
@@ -190,29 +171,11 @@ onMounted(async () => {
   // Démarrer la lecture automatiquement (avec un petit délai pour s'assurer que l'audio est initialisé)
   setTimeout(() => {
     if (audioElement.value) {
-      // Essayer d'abord avec le son
       audioElement.value.play().then(() => {
         isPlaying.value = true
       }).catch((error: unknown) => {
-        // Si l'autoplay avec son est bloqué, essayer en mode muted
-        console.log('Autoplay avec son bloqué, essai en mode muet:', error)
-        if (audioElement.value) {
-          const originalVolume = audioElement.value.volume
-          audioElement.value.muted = true
-          audioElement.value.play().then(() => {
-            isPlaying.value = true
-            // Réactiver le son après 500ms
-            setTimeout(() => {
-              if (audioElement.value) {
-                audioElement.value.muted = false
-                audioElement.value.volume = originalVolume
-              }
-            }, 500)
-          }).catch((muteError: unknown) => {
-            console.log('Autoplay complètement bloqué:', muteError)
-            // L'utilisateur devra cliquer sur la cassette
-          })
-        }
+        // Certains navigateurs bloquent l'autoplay, on laisse l'utilisateur cliquer
+        console.log('Autoplay bloqué par le navigateur:', error)
       })
     }
   }, 100)
