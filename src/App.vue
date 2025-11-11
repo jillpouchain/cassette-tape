@@ -151,11 +151,30 @@ const reloadTrack = async () => {
   // Recharger la configuration et la piste
   await loadMusicConfig()
   initAudio()
+  
+  // Démarrer la lecture automatiquement
+  if (audioElement.value) {
+    audioElement.value.play().then(() => {
+      isPlaying.value = true
+    }).catch((error) => {
+      console.log('Autoplay bloqué par le navigateur:', error)
+    })
+  }
 }
 
 onMounted(async () => {
   await loadMusicConfig()
   initAudio()
+  
+  // Démarrer la lecture automatiquement
+  if (audioElement.value) {
+    audioElement.value.play().then(() => {
+      isPlaying.value = true
+    }).catch((error) => {
+      // Certains navigateurs bloquent l'autoplay, on laisse l'utilisateur cliquer
+      console.log('Autoplay bloqué par le navigateur:', error)
+    })
+  }
   
   // Écouter les changements d'URL (navigation avec les boutons précédent/suivant)
   window.addEventListener('popstate', reloadTrack)
